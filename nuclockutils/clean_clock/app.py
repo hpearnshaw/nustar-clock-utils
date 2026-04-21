@@ -220,7 +220,7 @@ def plot_dash(all_data, table_new, gti, all_nustar_obs,
         'text': text[bad],
         'mode': 'markers',
         'name': f'Bad clock offset measurements',
-        'marker': {'color': 'grey', 'symbol': "x-dot", 'size': 3}
+        'marker': {'color': 'grey', 'symbol': "x-dot", 'size': 5}
     }), 1, 1)
 
     all_data_bad = all_data[bad]
@@ -233,7 +233,7 @@ def plot_dash(all_data, table_new, gti, all_nustar_obs,
             'text': text[bad],
             'mode': 'markers',
             'showlegend': False,
-            'marker': {'color': 'grey', 'symbol': "x-dot", 'size': 3}
+            'marker': {'color': 'grey', 'symbol': "x-dot", 'size': 5}
          }), row, 1)
 
     for station, color in zip(['MLD', 'SNG', 'UHI'], ['blue', 'red', 'orange']):
@@ -245,7 +245,7 @@ def plot_dash(all_data, table_new, gti, all_nustar_obs,
             'hovertemplate': hovertemplate,
             'text': text[good],
             'mode': 'markers',
-            'marker': {'color': color, 'size': 3},
+            'marker': {'color': color, 'size': 5},
             'name': f'Clock offset - {station}'
         }), 1, 1)
         for ydata, row in zip(['residual', 'residual_detrend'], [2, 3]):
@@ -256,7 +256,7 @@ def plot_dash(all_data, table_new, gti, all_nustar_obs,
                 'text': text[good],
                 'showlegend': False,
                 'mode': 'markers',
-                'marker': {'color': color, 'size': 3}
+                'marker': {'color': color, 'size': 5}
             }), row, 1)
 
     # bad_intervals = [[0, 77.767e6]]
@@ -418,8 +418,8 @@ def create_app():
         html.Div(
             className="three columns div-for-charts bg-grey",
             children=[
-            dcc.Graph(id='temperature-time-series'),
-            dcc.Graph(id='temperature-gradient-time-series'),
+            dcc.Graph(mathjax=True, id='temperature-time-series'),
+            dcc.Graph(mathjax=True, id='temperature-gradient-time-series'),
             ]
         ),
         html.Div(id='dummy', style={'display': 'none'}),
@@ -519,10 +519,15 @@ def create_app():
 
         if who_triggered == 'recalculate-button':
             log.info("Recalculating all")
+
+            for file in ['save_all.pickle', 'dump.hdf5', 'all_data_res.pkl', 'rolling_data.pkl']:
+
+                if os.path.exists(file):
+                    log.info(f"Removing file {file}")
+                    os.unlink(file)
+
             stored_analysis.cache_clear()
-            # cache.delete_memoized(stored_analysis, 'save_all.pickle')
-            if os.path.exists('save_all.pickle'):
-                os.unlink('save_all.pickle')
+
         elif who_triggered == 'actually-good-data-button' and len(NEW_BAD_POINTS) > 0:
             log.info("Removing point(s) from bad clock offset database")
             ALL_BAD_POINTS = eliminate_array_from_array(
@@ -554,28 +559,32 @@ def create_app():
 
 
     def create_temperature_timeseries(x, y, axis_type='linear'):
-        return {
-            "data": [dict(x=x.astype(float), y=y.astype(float), mode="lines")],
-            "layout": {
-                "height": 300,
-                "yaxis": {
-                    "title": "TCXO Temperature",
-                    "type": "linear" if axis_type == "Linear" else "log",
-                },
-                "xaxis": {"title": "met", "showgrid": False, "margin": {"t": 20}},
-            },
-        }
+        import plotly.graph_objects as go
+        fig = go.Figure()
+        fig.add_trace(go.Scattergl(x=np.asarray(x, dtype=float),
+                                   y=np.asarray(y, dtype=float), mode="lines"))
+        fig.update_layout(
+            height=300,
+            margin=dict(t=20, b=50, l=60, r=20),
+        )
+        fig.update_xaxes(title_text="MET (s)", showgrid=False)
+        fig.update_yaxes(title_text="TCXO Temperature (°C)",
+                         type="linear" if axis_type == "linear" else "log")
+        return fig
 
 
     def create_temperature_gradient_timeseries(x, y, axis_type='linear'):
-        return {
-            "data": [dict(x=x.astype(float), y=y.astype(float), mode="lines")],
-            "layout": {
-                "height": 300,
-                "yaxis": {"title": "TCXO Temp Gradient", "type": "linear"},
-                "xaxis": {"title": "met", "showgrid": False, "margin": {"t": 20}},
-            },
-        }
+        import plotly.graph_objects as go
+        fig = go.Figure()
+        fig.add_trace(go.Scattergl(x=np.asarray(x, dtype=float),
+                                   y=np.asarray(y, dtype=float) * 1e3, mode="lines"))
+        fig.update_layout(
+            height=300,
+            margin=dict(t=20, b=50, l=60, r=20),
+        )
+        fig.update_xaxes(title_text="MET (s)", showgrid=False)
+        fig.update_yaxes(title_text=r"TCXO Temp Gradient (1e-3 °C/s)", type="linear")
+        return fig
 
 
     @app.callback(
