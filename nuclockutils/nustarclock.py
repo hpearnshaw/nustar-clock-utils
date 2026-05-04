@@ -2461,6 +2461,8 @@ def temperature_correction_table(met_start, met_stop,
 
 def main_tempcorr(args=None):
     import argparse
+    log.info(f"This is nuclockutils v.{__version__}")
+    log.info(f"Executing main_tempcorr with args: {args}")
     description = ('Apply experimental temperature correction to NuSTAR'
                    'event files. For very recent ToO observations not covered'
                    'by the temperature history file or the frequency change '
@@ -2490,7 +2492,6 @@ def main_tempcorr(args=None):
 
     if args.region is not None:
         args.file = filter_with_region(args.file)
-    log.info(f"This is nuclockutils v.{__version__}")
 
     observation = NuSTARCorr(args.file, outfile=args.outfile,
                              adjust=not args.no_adjust,
@@ -2504,6 +2505,9 @@ def main_tempcorr(args=None):
 
 def main_create_clockfile(args=None):
     import argparse
+
+    log.info(f"Executing main_create_clockfile with args: {args}")
+
     description = ('Calculate experimental clock file for NuSTAR, using a '
                    'temperature-driven correction for the onboard TCXO.')
     parser = argparse.ArgumentParser(description=description)
@@ -2554,8 +2558,7 @@ def main_create_clockfile(args=None):
 
 def main_update_temptable(args=None):
     import argparse
-    log.info(f"This is nuclockutils v.{__version__}")
-
+    log.info(f"Executing main_update_temptable with args: {args}")
     description = ('Calculate experimental clock file for NuSTAR, using a '
                    'temperature-driven correction for the onboard TCXO.')
     parser = argparse.ArgumentParser(description=description)
@@ -2566,6 +2569,7 @@ def main_update_temptable(args=None):
                         help="Output HDF5 file name")
 
     args = parser.parse_args(args)
+    log.info(f"This is nuclockutils v.{__version__}")
 
     last_measurement = None
     existing_table = None
@@ -2603,6 +2607,8 @@ def main_update_temptable(args=None):
 def main_plot_diagnostics(args=None):
     import argparse
     import re
+
+    log.info(f"Executing main_plot_diagnostics with args: {args}")
     description = ('Plot diagnostic information about the newly produced '
                    'clock file.')
     parser = argparse.ArgumentParser(description=description)

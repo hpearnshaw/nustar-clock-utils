@@ -619,6 +619,8 @@ def main(args=None):
     global MODELVERSION
     import argparse
     import logging
+
+    log.info(f"Executing nustar_clean_clock with args: {args}")
     description = ('Clean clock offset measurements with an handy web '
                    'interface.')
     parser = argparse.ArgumentParser(description=description)
@@ -647,6 +649,7 @@ def main(args=None):
         MODELVERSION = args.temperature_model_version
     if args.debug:
         log.setLevel(logging.DEBUG)
+
     log.info(f"This is nuclockutils v.{__version__}")
 
     print("Creating app")
