@@ -28,6 +28,7 @@ from dash.dependencies import Input, Output
 from dash.exceptions import PreventUpdate
 from textwrap import dedent as d
 import json
+from nuclockutils import __version__
 
 
 CLOCKFILE='latest_clock.dat'
@@ -646,6 +647,7 @@ def main(args=None):
         MODELVERSION = args.temperature_model_version
     if args.debug:
         log.setLevel(logging.DEBUG)
+    log.info(f"This is nuclockutils v.{__version__}")
 
     print("Creating app")
     app = create_app()

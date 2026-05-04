@@ -85,6 +85,7 @@ from scipy.ndimage import median_filter
 from scipy.stats import norm
 from scipy.optimize import minimize
 
+from . import __version__
 from .utils import NUSTAR_MJDREF, splitext_improved, sec_to_mjd
 from .utils import filter_with_region, fix_byteorder, rolling_std
 from .utils import measure_overall_trend, cross_two_gtis, get_rough_trend_fun
@@ -2489,6 +2490,7 @@ def main_tempcorr(args=None):
 
     if args.region is not None:
         args.file = filter_with_region(args.file)
+    log.info(f"This is nuclockutils v.{__version__}")
 
     observation = NuSTARCorr(args.file, outfile=args.outfile,
                              adjust=not args.no_adjust,
@@ -2528,6 +2530,7 @@ def main_create_clockfile(args=None):
                         action='store_true', default=False)
 
     args = parser.parse_args(args)
+    log.info(f"This is nuclockutils v.{__version__}")
 
     clockcorr = ClockCorrection(temperature_file=args.tempfile,
                                 adjust_absolute_timing=True,
@@ -2551,6 +2554,8 @@ def main_create_clockfile(args=None):
 
 def main_update_temptable(args=None):
     import argparse
+    log.info(f"This is nuclockutils v.{__version__}")
+
     description = ('Calculate experimental clock file for NuSTAR, using a '
                    'temperature-driven correction for the onboard TCXO.')
     parser = argparse.ArgumentParser(description=description)
@@ -2608,6 +2613,7 @@ def main_plot_diagnostics(args=None):
                         help="Clock offset table")
 
     args = parser.parse_args(args)
+    log.info(f"This is nuclockutils v.{__version__}")
 
     clock_offset_table = read_clock_offset_table(args.clockoff)
     with fits.open(args.clockcorr) as hdul:
