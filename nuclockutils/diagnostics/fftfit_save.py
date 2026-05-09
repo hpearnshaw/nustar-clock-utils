@@ -38,7 +38,6 @@ def best_phase_func(tau, amp, pha, ngood=20):
     good = slice(1, ngood + 1)
     idx = np.arange(1, ngood + 1, dtype=int)
     res = np.sum(idx * amp[good] * np.sin(-pha[good] + TWOPI * idx * tau))
-    # print(tau, res)
     return res
 
 

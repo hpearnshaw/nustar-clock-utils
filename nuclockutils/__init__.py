@@ -1,4 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+import sys
 
 # Time constants (all in seconds unless noted)
 SECONDS_PER_DAY = 86400
@@ -27,6 +28,17 @@ except ImportError:
     version = '0.0.0'
 
 __version__ = version
+
+
+def log_execution():
+    from astropy import log
+    if len(sys.argv) > 1:
+        args_str = "args: " + ' '.join(sys.argv[1:])
+    else:
+        args_str = "no arguments"
+
+    log.info(f"This is nuclockutils v.{__version__}")
+    log.info(f"Executing {os.path.basename(sys.argv[0])} with {args_str}")
 
 from .nustarclock import *
 from .utils import *

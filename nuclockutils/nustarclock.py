@@ -85,7 +85,7 @@ from scipy.ndimage import median_filter
 from scipy.stats import norm
 from scipy.optimize import minimize
 
-from . import __version__
+from . import __version__, log_execution
 from .utils import NUSTAR_MJDREF, splitext_improved, sec_to_mjd
 from .utils import filter_with_region, fix_byteorder, rolling_std
 from .utils import measure_overall_trend, cross_two_gtis, get_rough_trend_fun
@@ -1888,7 +1888,6 @@ def plot_scatter(new_clock_table, clock_offset_table, shift_times=0,
     list_of_stations = sorted(list(set(all_data_res['station'])))
     stats = {}
     for station in list_of_stations:
-        print(station)
         nbins = 101
         fit_range = [-500, 1500]
         if station == 'MLD':
@@ -2418,12 +2417,12 @@ def temperature_correction_table(met_start, met_stop,
             # Get an estimate of the mean temperature closest to those dates
             if tempidx[0] == 0:
                 ref_t = np.mean(temptable['temperature_smooth'][:20])
-                print("Using average temperature at the start of series")
+                log.info("Using average temperature at the start of series")
             elif tempidx[1] == len(temptable):
                 ref_t = np.mean(temptable['temperature_smooth'][-20:])
-                print("Using average temperature at the end of series")
+                log.info("Using average temperature at the end of series")
             else:
-                print("Using average temperature")
+                log.info("Using average temperature")
                 ref_t = mean_history
 
             raw_mets = np.arange(start - 20, stop + 20)
@@ -2461,8 +2460,8 @@ def temperature_correction_table(met_start, met_stop,
 
 def main_tempcorr(args=None):
     import argparse
-    log.info(f"This is nuclockutils v.{__version__}")
-    log.info(f"Executing main_tempcorr with args: {args}")
+    log_execution()
+
     description = ('Apply experimental temperature correction to NuSTAR'
                    'event files. For very recent ToO observations not covered'
                    'by the temperature history file or the frequency change '
@@ -2506,7 +2505,7 @@ def main_tempcorr(args=None):
 def main_create_clockfile(args=None):
     import argparse
 
-    log.info(f"Executing main_create_clockfile with args: {args}")
+
 
     description = ('Calculate experimental clock file for NuSTAR, using a '
                    'temperature-driven correction for the onboard TCXO.')
@@ -2534,7 +2533,7 @@ def main_create_clockfile(args=None):
                         action='store_true', default=False)
 
     args = parser.parse_args(args)
-    log.info(f"This is nuclockutils v.{__version__}")
+    log_execution()
 
     clockcorr = ClockCorrection(temperature_file=args.tempfile,
                                 adjust_absolute_timing=True,
@@ -2558,7 +2557,7 @@ def main_create_clockfile(args=None):
 
 def main_update_temptable(args=None):
     import argparse
-    log.info(f"Executing main_update_temptable with args: {args}")
+
     description = ('Calculate experimental clock file for NuSTAR, using a '
                    'temperature-driven correction for the onboard TCXO.')
     parser = argparse.ArgumentParser(description=description)
@@ -2569,7 +2568,7 @@ def main_update_temptable(args=None):
                         help="Output HDF5 file name")
 
     args = parser.parse_args(args)
-    log.info(f"This is nuclockutils v.{__version__}")
+    log_execution()
 
     last_measurement = None
     existing_table = None
@@ -2608,7 +2607,7 @@ def main_plot_diagnostics(args=None):
     import argparse
     import re
 
-    log.info(f"Executing main_plot_diagnostics with args: {args}")
+
     description = ('Plot diagnostic information about the newly produced '
                    'clock file.')
     parser = argparse.ArgumentParser(description=description)
@@ -2619,7 +2618,7 @@ def main_plot_diagnostics(args=None):
                         help="Clock offset table")
 
     args = parser.parse_args(args)
-    log.info(f"This is nuclockutils v.{__version__}")
+    log_execution()
 
     clock_offset_table = read_clock_offset_table(args.clockoff)
     with fits.open(args.clockcorr) as hdul:

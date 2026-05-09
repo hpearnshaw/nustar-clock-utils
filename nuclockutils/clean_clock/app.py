@@ -28,7 +28,7 @@ from dash.dependencies import Input, Output
 from dash.exceptions import PreventUpdate
 from textwrap import dedent as d
 import json
-from nuclockutils import __version__
+from nuclockutils import __version__, log_execution
 
 
 CLOCKFILE='latest_clock.dat'
@@ -504,7 +504,7 @@ def create_app():
         log.info(f"Pressed {who_triggered}")
 
         if who_triggered == 'selected-data':
-            print("Preventing update")
+            log.info("Preventing update")
             raise PreventUpdate
 
         ALL_BAD_POINTS = get_bad_points_db()
@@ -619,8 +619,8 @@ def main(args=None):
     global MODELVERSION
     import argparse
     import logging
+    import sys
 
-    log.info(f"Executing nustar_clean_clock with args: {args}")
     description = ('Clean clock offset measurements with an handy web '
                    'interface.')
     parser = argparse.ArgumentParser(description=description)
@@ -639,6 +639,7 @@ def main(args=None):
     parser.add_argument("--devel", action='store_true', help="Enable development mode")
     parser.add_argument("--debug", action='store_true', help="Enable debug logging")
     args = parser.parse_args(args)
+
     if args.temperature_file is not None:
         TEMPFILE = args.temperature_file
     if args.clock_offset_file is not None:
@@ -650,9 +651,9 @@ def main(args=None):
     if args.debug:
         log.setLevel(logging.DEBUG)
 
-    log.info(f"This is nuclockutils v.{__version__}")
+    log_execution()
 
-    print("Creating app")
+    log.info("Creating app")
     app = create_app()
     try:
         app.run(debug=args.devel, use_reloader=False)
