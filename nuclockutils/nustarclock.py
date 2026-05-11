@@ -2398,7 +2398,8 @@ def temperature_correction_table(met_start, met_stop,
             continue
         if met_intv[0] > met_stop:
             break
-        if met_intv[0] > met_intv[1]:
+        if met_intv[0]+time_resolution >= met_intv[1]:
+            # Ignore intervals of negative length, 0 length, or less than a time resolution element long
             log.warning(f"Invalid interval: {met_intv}")
             continue
 
