@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from uncertainties import ufloat
 from astropy import log
 from statsmodels.robust import mad
+from nuclockutils.utils import SECONDS_PER_DAY
 
 from .fftfit import fftfit
 
@@ -20,7 +21,6 @@ def format_for_plotting(phase, prof, period_ms):
 
 
 def format_profile_and_get_phase(file, template=None):
-    print(file)
     table = Table.read(file)
     mjd = table.meta['mjd']
     if 'epoch' in table.meta:
@@ -33,7 +33,7 @@ def format_profile_and_get_phase(file, template=None):
     fddot = 0
     if 'F2' in table.meta:
         fddot = table.meta['F2']
-    delta_t = (mjd - pepoch) * 86400
+    delta_t = (mjd - pepoch) * SECONDS_PER_DAY
     f0 = freq + fdot * delta_t + 0.5 * fddot * delta_t ** 2
 
     period_ms = 1 / f0 * 1000
@@ -123,7 +123,6 @@ def main(args=None):
     maxs = np.array(maxs) - ref_max
     phases = np.array(phases)
     phase_errs = np.array(phase_errs)
-    # print(mjds.size, phases.size, phase_errs.size)
 
     fit_max = np.mean(phases)
 
@@ -138,8 +137,7 @@ def main(args=None):
     plt.ylabel("Flux (arbitrary units)")
     shift = ufloat(np.mean(maxs), np.std(maxs))
     fit_shift = ufloat(fit_max, tot_err)
-    # print(f"Fitted Mean shift = {fit_shift}" + " ms")
-    # print(f"Mean shift = {shift}" + " ms")
+
     if len(files) >= 2:
         plt.title(f"Mean shift = {fit_shift}" + " ms")
     else:
